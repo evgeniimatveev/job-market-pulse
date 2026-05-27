@@ -7,10 +7,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+RUN chmod +x dashboard/start.sh
+
 # HF Spaces uses port 7860
 EXPOSE 7860
 
-CMD ["streamlit", "run", "dashboard/app.py", \
-     "--server.port=7860", \
-     "--server.address=0.0.0.0", \
-     "--server.headless=true"]
+CMD ["bash", "dashboard/start.sh"]
