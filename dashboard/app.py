@@ -15,6 +15,11 @@ st.set_page_config(
 )
 
 # ── Brand colors per stack ────────────────────────────────────────────────────
+def hex_rgba(hex_color: str, alpha: float) -> str:
+    h = hex_color.lstrip("#")
+    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    return f"rgba({r},{g},{b},{alpha})"
+
 STACK_COLORS = {
     "Python":    "#3776AB",
     "SQL":       "#E38C00",
@@ -307,6 +312,8 @@ else:
             name=stack, mode="lines+markers",
             line=dict(color=color, width=2.5),
             marker=dict(size=9, color=color, line=dict(color="#0f172a", width=1.5)),
+            fill="tozeroy",
+            fillcolor=hex_rgba(color, 0.08),
             hovertemplate=f"<b>{stack}</b><br>%{{x|%b %d %H:%M}}<br>Score: %{{y:.1f}}<extra></extra>",
         ))
     fig_trend.update_layout(
@@ -375,65 +382,70 @@ sal = latest.dropna(subset=["salary_avg"])
 if sal.empty:
     st.info("No salary data in this snapshot.")
 else:
+    # Use median min/max to kill outliers, mean avg for the dot
     sal_agg = (
         sal.groupby("tech_stack")
-        .agg(salary_avg=("salary_avg","mean"), salary_min=("salary_min","min"), salary_max=("salary_max","max"), pct=("salary_disclosed_pct","mean"))
+        .agg(
+            salary_avg=("salary_avg", "mean"),
+            salary_min=("salary_min", "median"),
+            salary_max=("salary_max", lambda x: x.quantile(0.90)),
+            pct=("salary_disclosed_pct", "mean"),
+        )
         .reset_index()
         .sort_values("salary_avg", ascending=True)
     )
     sal_agg["color"] = sal_agg["tech_stack"].map(STACK_COLORS)
 
+    # X-axis cap: 90th percentile of salary_max + 20% headroom
+    x_cap = sal_agg["salary_max"].quantile(0.95) * 1.15
+
     fig_sal = go.Figure()
-    # Range bars (min → max)
+    # Range bars (median_min → p90_max)
     for _, row in sal_agg.iterrows():
         fig_sal.add_trace(go.Scatter(
             x=[row["salary_min"], row["salary_max"]],
             y=[row["tech_stack"], row["tech_stack"]],
             mode="lines",
-            line=dict(color=row["color"], width=6),
+            line=dict(color=row["color"], width=8),
             showlegend=False,
-            hoverinfo="skip",
+            hovertemplate=(
+                f"<b>{row['tech_stack']}</b><br>"
+                f"Typical range: ${row['salary_min']/1000:.0f}k – ${row['salary_max']/1000:.0f}k<extra></extra>"
+            ),
         ))
     # Avg dot
     fig_sal.add_trace(go.Scatter(
         x=sal_agg["salary_avg"],
         y=sal_agg["tech_stack"],
         mode="markers+text",
-        marker=dict(size=14, color=sal_agg["color"].tolist(), line=dict(color="#0f172a", width=2)),
-        text=sal_agg["salary_avg"].apply(lambda v: f"${v/1000:.0f}k"),
+        marker=dict(size=16, color=sal_agg["color"].tolist(), line=dict(color="#0f172a", width=2.5)),
+        text=sal_agg["salary_avg"].apply(lambda v: f"  ${v/1000:.0f}k avg"),
         textposition="middle right",
-        textfont=dict(size=11, color="#e2e8f0"),
+        textfont=dict(size=12, color="#e2e8f0"),
         hovertemplate="<b>%{y}</b><br>Avg: $%{x:,.0f}<extra></extra>",
         showlegend=False,
     ))
-    # Disclosed % annotation
+    # Disclosed % on left
     for _, row in sal_agg.iterrows():
         fig_sal.add_annotation(
             x=row["salary_min"], y=row["tech_stack"],
-            text=f'{row["pct"]:.0f}%',
-            showarrow=False, xanchor="right", xshift=-8,
-            font=dict(size=10, color="#64748b"),
+            text=f'{row["pct"]:.0f}% disclosed',
+            showarrow=False, xanchor="right", xshift=-10,
+            font=dict(size=10, color="#475569"),
         )
 
     fig_sal.update_layout(
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
-        height=420,
-        margin=dict(l=10, r=100, t=10, b=40),
+        height=430,
+        margin=dict(l=10, r=120, t=10, b=30),
         xaxis=dict(
             showgrid=True, gridcolor="#1e293b",
             tickformat="$,.0f", title="Annual Salary (USD)",
-            color="#64748b",
+            color="#64748b", range=[0, x_cap],
         ),
         yaxis=dict(showgrid=False, color="#e2e8f0", tickfont=dict(size=13)),
         font=dict(family="Inter, sans-serif"),
-        annotations=list(fig_sal.layout.annotations) + [
-            dict(
-                x=0.01, y=-0.08, xref="paper", yref="paper",
-                text="← numbers on left = % of listings disclosing salary",
-                showarrow=False, font=dict(size=10, color="#475569"),
-            )
-        ],
     )
     st.plotly_chart(fig_sal, width='stretch')
 
