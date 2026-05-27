@@ -258,7 +258,7 @@ fig_demand = go.Figure(go.Bar(
     customdata=demand["job_count"],
 ))
 fig_demand.update_layout(
-    plot_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="#0f172a",
     paper_bgcolor="rgba(0,0,0,0)",
     height=420,
     margin=dict(l=10, r=120, t=10, b=10),
@@ -315,7 +315,7 @@ else:
             hovertemplate=f"<b>{stack}</b><br>%{{x|%b %d %H:%M}}<br>Score: %{{y:.1f}}<extra></extra>",
         ))
     fig_trend.update_layout(
-        plot_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="#0f172a",
         paper_bgcolor="rgba(0,0,0,0)",
         height=420,
         margin=dict(l=10, r=10, t=10, b=10),
@@ -356,7 +356,7 @@ fig_remote = go.Figure(go.Bar(
     hovertemplate="<b>%{y}</b><br>Remote: %{x:.1f}%<extra></extra>",
 ))
 fig_remote.update_layout(
-    plot_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="#0f172a",
     paper_bgcolor="rgba(0,0,0,0)",
     height=400,
     margin=dict(l=10, r=80, t=10, b=10),
@@ -433,7 +433,7 @@ else:
         )
 
     fig_sal.update_layout(
-        plot_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="#0f172a",
         paper_bgcolor="rgba(0,0,0,0)",
         height=430,
         margin=dict(l=10, r=120, t=10, b=30),
@@ -473,7 +473,7 @@ fig_heat.update_traces(
     textfont=dict(size=11, color="white"),
 )
 fig_heat.update_layout(
-    plot_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="#0f172a",
     paper_bgcolor="rgba(0,0,0,0)",
     height=480,
     margin=dict(l=10, r=10, t=10, b=10),
