@@ -7,11 +7,34 @@ sdk: docker
 pinned: false
 ---
 
-# 📊 Job Market Pulse
+![Job Market Pulse Banner](assets/banner.png)
 
-> *I tracked 10,000+ data job listings daily to find out what the market actually pays for data skills.*
+## 🔴 Live Demo → [huggingface.co/spaces/evgeniimatveevusa/job-market-pulse](https://huggingface.co/spaces/evgeniimatveevusa/job-market-pulse)
 
-**Live dashboard tracking demand, salaries, and remote trends across 10 tech stacks in the US job market — updated every morning.**
+---
+
+## What it does
+
+Pulls **110 API calls per day** from Adzuna, stores everything in DuckDB, and serves a Streamlit dashboard — fully automated, zero manual steps, $0 hosting cost.
+
+> *"I tracked 10,000+ US tech job listings daily to find out what the market actually pays for data skills."*
+
+---
+
+## Dashboard
+
+![Hero and KPIs](assets/hero_kpi.png)
+
+![Demand Ranking](assets/demand_ranking.png)
+
+<table>
+<tr>
+<td><img src="assets/remote.png"/></td>
+<td><img src="assets/salary.png"/></td>
+</tr>
+</table>
+
+![City Heatmap](assets/heatmap.png)
 
 ---
 
@@ -22,50 +45,51 @@ pinned: false
 | **Tech stacks** | Python · SQL · Tableau · Power BI · dbt · Spark · Airflow · Snowflake · AWS · Azure |
 | **Cities** | New York · LA · Chicago · SF · Seattle · Austin · Boston · Denver · Atlanta · Dallas + Remote |
 | **Metrics** | Job count · Demand score · Salary avg/min/max · Remote % · Salary disclosure rate |
-| **Update frequency** | Daily at 7:00 AM PST via GitHub Actions |
-
----
-
-## Dashboard sections
-
-1. **KPI Row** — Top stack today · Highest paying · Most remote-friendly · Biggest weekly mover  
-2. **Demand Ranking** — Normalized 0–100 score, not raw counts — stacks are comparable  
-3. **Trend Over Time** — The main feature: history accumulates, gets more valuable monthly  
-4. **Remote Friendliness** — Which skills travel best  
-5. **Salary Intelligence** — Range + % of listings that actually disclose salary  
-6. **City Heatmap** — 10 stacks × 10 cities: where each skill concentrates  
+| **Cadence** | Daily at 7:00 AM PST via GitHub Actions |
 
 ---
 
 ## Architecture
 
 ```
-Adzuna API (110 calls/day)
-    ↓
-src/extract.py → src/transform.py → src/load.py
-    ↓
-DuckDB (job_market.duckdb) — stored on HuggingFace Dataset
-    ↓
-GitHub Actions (daily cron) → download DB → run → upload DB
-    ↓
-Streamlit dashboard on HuggingFace Spaces
+Adzuna API  ──►  extract.py  ──►  transform.py  ──►  load.py
+                                                        │
+                                                   DuckDB file
+                                                        │
+                          ┌─────────────────────────────┤
+                          │                             │
+                   HuggingFace Dataset           GitHub Actions
+                   (persistent storage)          (daily cron)
+                          │
+                   HuggingFace Space
+                   (Streamlit dashboard)
 ```
 
-**Key design choice:** DuckDB file lives on a HuggingFace Dataset repo, downloaded before each run and re-uploaded after — zero database hosting cost, full history preserved.
+**Key design decision:** DuckDB file lives on a HuggingFace Dataset — downloaded before each run, updated after. Zero database hosting cost, full history preserved indefinitely.
 
 ---
 
-## Findings (Day 1 — May 26 2026)
+## Demand Score formula
 
-| Stack | Total US Jobs | Avg Salary | Remote % |
-|-------|-------------|------------|---------|
-| Python | 27,718 | — | 31% |
-| AWS | 21,959 | $187k | 13% |
-| SQL | 19,443 | $142k | 25% |
-| Azure | 13,401 | $150k | 21% |
-| dbt | 1,712 | — | 12% |
+```
+demand_score = (stack_count - min_count) / (max_count - min_count) × 100
+```
 
-*New York dominates every stack. Python + SQL are most remote-friendly.*
+Normalized per run so stacks are always comparable regardless of absolute count differences. Python = 100 baseline.
+
+---
+
+## Day 1 findings (May 26 2026)
+
+| Rank | Stack | Jobs | Avg Salary | Remote % |
+|------|-------|------|-----------|---------|
+| #1 | Python | 27,764 | $137k | 31% |
+| #2 | AWS | 21,999 | $187k | 13% |
+| #3 | SQL | 19,472 | $142k | 25% |
+| #4 | Azure | 13,424 | $150k | 21% |
+| #10 | dbt | 1,712 | $128k | 12% |
+
+*New York dominates every single stack. Python + SQL most remote-friendly. Airflow & dbt most niche.*
 
 ---
 
@@ -75,4 +99,4 @@ Streamlit dashboard on HuggingFace Spaces
 
 ---
 
-*Data from [Adzuna](https://www.adzuna.com/) — updated daily. Salary data only where disclosed by employers.*
+*Data from [Adzuna](https://www.adzuna.com/) · Updated daily · Built by [Evgenii Matveev](https://github.com/evgeniimatveev)*
