@@ -21,7 +21,7 @@ def main():
         repo_id=HF_REPO,
         repo_type="dataset",
     )
-    print(f"Uploaded {DB_PATH} → {HF_REPO}")
+    print(f"Uploaded {DB_PATH} to {HF_REPO}")
 
 
 if __name__ == "__main__":
