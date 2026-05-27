@@ -312,8 +312,6 @@ else:
             name=stack, mode="lines+markers",
             line=dict(color=color, width=2.5),
             marker=dict(size=9, color=color, line=dict(color="#0f172a", width=1.5)),
-            fill="tozeroy",
-            fillcolor=hex_rgba(color, 0.08),
             hovertemplate=f"<b>{stack}</b><br>%{{x|%b %d %H:%M}}<br>Score: %{{y:.1f}}<extra></extra>",
         ))
     fig_trend.update_layout(
@@ -376,7 +374,7 @@ st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
 # ── Section 5: Salary Intelligence ────────────────────────────────────────────
 st.markdown('<div class="section-title">Salary Intelligence</div>', unsafe_allow_html=True)
-st.markdown('<div class="section-sub">Average salary with min–max range · Only listings that disclose compensation</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-sub">Typical salary range (median min → p90 max) with avg dot · Capped at $300k · Only listings disclosing compensation</div>', unsafe_allow_html=True)
 
 sal = latest.dropna(subset=["salary_avg"])
 if sal.empty:
@@ -396,8 +394,8 @@ else:
     )
     sal_agg["color"] = sal_agg["tech_stack"].map(STACK_COLORS)
 
-    # X-axis cap: 90th percentile of salary_max + 20% headroom
-    x_cap = sal_agg["salary_max"].quantile(0.95) * 1.15
+    # Hard cap at $300k — cloud outliers (AWS $500k listings) distort the chart
+    x_cap = 300_000
 
     fig_sal = go.Figure()
     # Range bars (median_min → p90_max)
