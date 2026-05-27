@@ -9,32 +9,68 @@ pinned: false
 
 ![Job Market Pulse Banner](assets/banner.png)
 
-## 🔴 Live Demo → [huggingface.co/spaces/evgeniimatveevusa/job-market-pulse](https://huggingface.co/spaces/evgeniimatveevusa/job-market-pulse)
+<p align="center">
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white"/></a>
+  <a href="https://duckdb.org/"><img src="https://img.shields.io/badge/DuckDB-1.1.3-FFF000?style=flat-square&logo=duckdb&logoColor=black"/></a>
+  <a href="https://streamlit.io/"><img src="https://img.shields.io/badge/Streamlit-1.40+-FF4B4B?style=flat-square&logo=streamlit&logoColor=white"/></a>
+  <a href="https://plotly.com/"><img src="https://img.shields.io/badge/Plotly-5.24-636EFA?style=flat-square&logo=plotly&logoColor=white"/></a>
+  <a href=".github/workflows/pipeline.yml"><img src="https://img.shields.io/badge/GitHub_Actions-1×/day-2088FF?style=flat-square&logo=githubactions&logoColor=white"/></a>
+  <a href="https://huggingface.co/spaces/evgeniimatveevusa/job-market-pulse"><img src="https://img.shields.io/badge/HuggingFace-Spaces-FFD21E?style=flat-square&logo=huggingface&logoColor=black"/></a>
+</p>
 
 ---
 
-## What it does
+Daily tracking of tech job demand, salaries & remote trends across **10 tech stacks × 10 US cities + remote** — from API ingestion to a live Streamlit dashboard. Refreshed automatically **once a day** via GitHub Actions. Zero manual steps after deploy.
 
-Pulls **110 API calls per day** from Adzuna, stores everything in DuckDB, and serves a Streamlit dashboard — fully automated, zero manual steps, $0 hosting cost.
+> *"Built an end-to-end market intelligence pipeline: API → transform → DuckDB → visualize → automate. 10 stacks. 11 locations. $0 infrastructure cost."*
 
-> *"I tracked 10,000+ US tech job listings daily to find out what the market actually pays for data skills."*
+**[Live Demo → HuggingFace Spaces](https://huggingface.co/spaces/evgeniimatveevusa/job-market-pulse)**
 
 ---
 
 ## Dashboard
 
+<details>
+<summary>🏆 Hero & KPI Cards</summary>
+
 ![Hero and KPIs](assets/hero_kpi.png)
+
+</details>
+
+<details>
+<summary>📊 Demand Ranking</summary>
 
 ![Demand Ranking](assets/demand_ranking.png)
 
-<table>
-<tr>
-<td><img src="assets/remote.png"/></td>
-<td><img src="assets/salary.png"/></td>
-</tr>
-</table>
+</details>
+
+<details>
+<summary>📈 Demand Trend Over Time</summary>
+
+![Trend](assets/trend.png)
+
+</details>
+
+<details>
+<summary>🌐 Remote Friendliness by Stack</summary>
+
+![Remote](assets/remote.png)
+
+</details>
+
+<details>
+<summary>💰 Salary Intelligence</summary>
+
+![Salary](assets/salary.png)
+
+</details>
+
+<details>
+<summary>🗺️ City Heatmap — Stack × City</summary>
 
 ![City Heatmap](assets/heatmap.png)
+
+</details>
 
 ---
 
@@ -56,13 +92,13 @@ Adzuna API  ──►  extract.py  ──►  transform.py  ──►  load.py
                                                         │
                                                    DuckDB file
                                                         │
-                          ┌─────────────────────────────┤
-                          │                             │
-                   HuggingFace Dataset           GitHub Actions
-                   (persistent storage)          (daily cron)
-                          │
-                   HuggingFace Space
-                   (Streamlit dashboard)
+                    ┌───────────────────────────────────┤
+                    │                                   │
+             HuggingFace Dataset                 GitHub Actions
+             (persistent storage)                (daily cron)
+                    │
+             HuggingFace Space
+             (Streamlit dashboard)
 ```
 
 **Key design decision:** DuckDB file lives on a HuggingFace Dataset — downloaded before each run, updated after. Zero database hosting cost, full history preserved indefinitely.
