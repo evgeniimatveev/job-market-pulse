@@ -276,12 +276,23 @@ st.markdown('<div class="section-sub">How demand score evolves daily — gets mo
 if len(runs) < 2:
     st.info("Trend chart activates after 2 pipeline runs. Check back tomorrow!")
 else:
+    # Join history with runs to get clean run timestamps
+    runs_ts = runs[["run_id", "started_at"]].copy()
+    runs_ts["started_at"] = pd.to_datetime(runs_ts["started_at"], utc=True)
+    hist_with_ts = history.merge(runs_ts, on="run_id")
+
     trend = (
-        history.groupby(["fetched_at", "tech_stack"])["demand_score"]
+        hist_with_ts.groupby(["started_at", "tech_stack"])["demand_score"]
         .mean()
         .reset_index()
+        .rename(columns={"started_at": "run_time"})
     )
-    trend["fetched_at"] = pd.to_datetime(trend["fetched_at"]).dt.date
+
+    # Label: "May 26 19:48" style
+    trend["label"] = trend["run_time"].dt.strftime("%-d %b %H:%M")
+    unique_times = trend["run_time"].sort_values().unique()
+    tickvals = list(unique_times)
+    ticktext = [pd.Timestamp(t).strftime("%-d %b\n%H:%M") for t in tickvals]
 
     all_stacks = sorted(trend["tech_stack"].unique())
     selected = st.multiselect("Filter stacks", all_stacks, default=all_stacks, key="trend_filter")
@@ -289,23 +300,27 @@ else:
 
     fig_trend = go.Figure()
     for stack in selected:
-        s = trend_f[trend_f["tech_stack"] == stack].sort_values("fetched_at")
+        s = trend_f[trend_f["tech_stack"] == stack].sort_values("run_time")
         color = STACK_COLORS.get(stack, "#888")
         fig_trend.add_trace(go.Scatter(
-            x=s["fetched_at"], y=s["demand_score"],
+            x=s["run_time"], y=s["demand_score"],
             name=stack, mode="lines+markers",
             line=dict(color=color, width=2.5),
-            marker=dict(size=7, color=color),
-            hovertemplate=f"<b>{stack}</b><br>%{{x}}<br>Score: %{{y:.1f}}<extra></extra>",
+            marker=dict(size=9, color=color, line=dict(color="#0f172a", width=1.5)),
+            hovertemplate=f"<b>{stack}</b><br>%{{x|%b %d %H:%M}}<br>Score: %{{y:.1f}}<extra></extra>",
         ))
     fig_trend.update_layout(
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
-        height=400,
+        height=420,
         margin=dict(l=10, r=10, t=10, b=10),
-        xaxis=dict(showgrid=True, gridcolor="#1e293b", color="#64748b"),
+        xaxis=dict(
+            showgrid=True, gridcolor="#1e293b", color="#64748b",
+            tickvals=tickvals, ticktext=ticktext,
+            tickfont=dict(size=11),
+        ),
         yaxis=dict(showgrid=True, gridcolor="#1e293b", title="Demand Score", color="#64748b"),
-        legend=dict(bgcolor="rgba(0,0,0,0)", bordercolor="#334155", borderwidth=1),
+        legend=dict(bgcolor="rgba(15,23,42,0.8)", bordercolor="#334155", borderwidth=1),
         font=dict(family="Inter, sans-serif"),
     )
     st.plotly_chart(fig_trend, use_container_width=True)
@@ -453,12 +468,11 @@ fig_heat.update_layout(
     height=480,
     margin=dict(l=10, r=10, t=10, b=10),
     coloraxis_colorbar=dict(
-        title="Jobs",
+        title=dict(text="Jobs", font=dict(color="#64748b")),
         tickformat=",",
         bgcolor="rgba(0,0,0,0)",
         outlinecolor="#334155",
         tickcolor="#64748b",
-        titlefont=dict(color="#64748b"),
         tickfont=dict(color="#64748b"),
     ),
     xaxis=dict(color="#94a3b8", tickfont=dict(size=12)),
