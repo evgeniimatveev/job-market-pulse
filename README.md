@@ -18,6 +18,30 @@ pinned: false
   <a href="https://huggingface.co/spaces/evgeniimatveevusa/job-market-pulse"><img src="https://img.shields.io/badge/HuggingFace-Spaces-FFD21E?style=flat-square&logo=huggingface&logoColor=black"/></a>
 </p>
 
+<!-- MARKET_PULSE:START -->
+
+## 📰 Today's Market Report
+
+> 🗓️ **May 26 2026** &nbsp;·&nbsp; Pipeline run **#2** &nbsp;·&nbsp; 220 total records
+
+| 🏆 Top Stack | 💰 Highest Paying | 🌐 Most Remote-Friendly |
+|---|---|---|
+| **Python** — 27,764 listings | **AWS** — $187k avg | **Python** — 31% remote |
+
+**Top 5 demand ranking (latest run):**
+
+| Rank | Stack | Listings | Demand Score |
+|------|-------|----------|--------------|
+| 🥇 | **Python** | 27,764 | 37.5/100 |
+| 🥈 | **AWS** | 21,999 | 29.7/100 |
+| 🥉 | **SQL** | 19,472 | 26.3/100 |
+| 4️⃣ | **Azure** | 13,424 | 18.1/100 |
+| 5️⃣ | **Tableau** | 6,237 | 8.4/100 |
+
+*Auto-updated daily by [GitHub Actions](.github/workflows/pipeline.yml) · Powered by [Adzuna API](https://www.adzuna.com/)*
+
+<!-- MARKET_PULSE:END -->
+
 ---
 
 Daily tracking of tech job demand, salaries & remote trends across **10 tech stacks × 10 US cities + remote** — from API ingestion to a live Streamlit dashboard. Refreshed automatically **once a day** via GitHub Actions. Zero manual steps after deploy.
