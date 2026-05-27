@@ -265,7 +265,7 @@ fig_demand.update_layout(
     yaxis=dict(showgrid=False, color="#e2e8f0", tickfont=dict(size=13)),
     font=dict(family="Inter, sans-serif"),
 )
-st.plotly_chart(fig_demand, use_container_width=True)
+st.plotly_chart(fig_demand, width='stretch')
 
 st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
@@ -289,10 +289,10 @@ else:
     )
 
     # Label: "May 26 19:48" style
-    trend["label"] = trend["run_time"].dt.strftime("%-d %b %H:%M")
+    trend["label"] = trend["run_time"].dt.strftime("%d %b %H:%M")
     unique_times = trend["run_time"].sort_values().unique()
     tickvals = list(unique_times)
-    ticktext = [pd.Timestamp(t).strftime("%-d %b\n%H:%M") for t in tickvals]
+    ticktext = [pd.Timestamp(t).strftime("%d %b\n%H:%M") for t in tickvals]
 
     all_stacks = sorted(trend["tech_stack"].unique())
     selected = st.multiselect("Filter stacks", all_stacks, default=all_stacks, key="trend_filter")
@@ -323,7 +323,7 @@ else:
         legend=dict(bgcolor="rgba(15,23,42,0.8)", bordercolor="#334155", borderwidth=1),
         font=dict(family="Inter, sans-serif"),
     )
-    st.plotly_chart(fig_trend, use_container_width=True)
+    st.plotly_chart(fig_trend, width='stretch')
 
 st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
@@ -363,7 +363,7 @@ fig_remote.update_layout(
     yaxis=dict(showgrid=False, color="#e2e8f0", tickfont=dict(size=13)),
     font=dict(family="Inter, sans-serif"),
 )
-st.plotly_chart(fig_remote, use_container_width=True)
+st.plotly_chart(fig_remote, width='stretch')
 
 st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
@@ -435,7 +435,7 @@ else:
             )
         ],
     )
-    st.plotly_chart(fig_sal, use_container_width=True)
+    st.plotly_chart(fig_sal, width='stretch')
 
 st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
@@ -479,7 +479,7 @@ fig_heat.update_layout(
     yaxis=dict(color="#94a3b8", tickfont=dict(size=12)),
     font=dict(family="Inter, sans-serif"),
 )
-st.plotly_chart(fig_heat, use_container_width=True)
+st.plotly_chart(fig_heat, width='stretch')
 
 # ── Footer ─────────────────────────────────────────────────────────────────────
 st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
