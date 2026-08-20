@@ -16,6 +16,7 @@ files = [
     "src/__init__.py",
     "scripts/download_db.py",
     "scripts/upload_db.py",
+    "scripts/r2_client.py",
     "run_pipeline.py",
     "requirements.txt",
     "Dockerfile",

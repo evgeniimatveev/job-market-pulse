@@ -1,11 +1,12 @@
-"""Upload DuckDB file to HuggingFace Dataset (same pattern as weather pipeline)."""
+"""Upload DuckDB file to Cloudflare R2 (same pattern as weather pipeline)."""
 import os
 import sys
 from pathlib import Path
-from huggingface_hub import HfApi
 
-HF_REPO = os.environ.get("HF_REPO", "evgeniimatveev/job-market-pulse-db")
-HF_TOKEN = os.environ["HF_TOKEN"]
+from r2_client import get_r2_client
+
+BUCKET = os.environ["R2_BUCKET"]
+KEY = "job-market-pulse/job_market.duckdb"
 DB_PATH = Path("data/job_market.duckdb")
 
 
@@ -14,14 +15,8 @@ def main():
         print(f"DB not found at {DB_PATH}", file=sys.stderr)
         sys.exit(1)
 
-    api = HfApi(token=HF_TOKEN)
-    api.upload_file(
-        path_or_fileobj=str(DB_PATH),
-        path_in_repo="job_market.duckdb",
-        repo_id=HF_REPO,
-        repo_type="dataset",
-    )
-    print(f"Uploaded {DB_PATH} to {HF_REPO}")
+    get_r2_client().upload_file(str(DB_PATH), BUCKET, KEY)
+    print(f"Uploaded {DB_PATH} to r2://{BUCKET}/{KEY}")
 
 
 if __name__ == "__main__":
