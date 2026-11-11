@@ -22,21 +22,21 @@ pinned: false
 
 ## 📰 Today's Market Report
 
-> 🗓️ **Nov 10 2026** &nbsp;·&nbsp; Pipeline run **#167** &nbsp;·&nbsp; 18,370 total records
+> 🗓️ **Nov 11 2026** &nbsp;·&nbsp; Pipeline run **#168** &nbsp;·&nbsp; 18,480 total records
 
 | 🏆 Top Stack | 💰 Highest Paying | 🌐 Most Remote-Friendly |
 |---|---|---|
-| **Python** — 36,181 listings | **AWS** — $185k avg | **dbt** — 41% remote |
+| **AWS** — 27,450 listings | **AWS** — $184k avg | **dbt** — 42% remote |
 
 **Top 5 demand ranking (latest run):**
 
 | Rank | Stack | Listings | Demand Score |
 |------|-------|----------|--------------|
-| 🥇 | **Python** | 36,181 | 37.4/100 |
-| 🥈 | **AWS** | 27,815 | 28.8/100 |
-| 🥉 | **SQL** | 23,307 | 24.1/100 |
-| 4️⃣ | **Azure** | 17,327 | 17.9/100 |
-| 5️⃣ | **Spark** | 7,923 | 8.2/100 |
+| 🥇 | **AWS** | 27,450 | 40.7/100 |
+| 🥈 | **SQL** | 23,082 | 34.3/100 |
+| 🥉 | **Python** | 19,558 | 29.0/100 |
+| 4️⃣ | **Azure** | 17,106 | 25.4/100 |
+| 5️⃣ | **Spark** | 7,774 | 11.5/100 |
 
 *Auto-updated daily by [GitHub Actions](.github/workflows/pipeline.yml) · Powered by [Adzuna API](https://www.adzuna.com/)*
 
