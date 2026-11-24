@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      issues: write   # drift check opens an issue when history is rewritten
 
     steps:
       - uses: actions/checkout@v5
@@ -30,11 +31,38 @@ jobs:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
         run: python scripts/download_db.py
 
+      - name: Snapshot yesterday's DB (for the drift check)
+        run: |
+          if [ -f data/job_market.duckdb ]; then
+            cp data/job_market.duckdb "$RUNNER_TEMP/yesterday.duckdb"
+          else
+            echo "No previous database (first run): drift check will be skipped"
+          fi
+
       - name: Run pipeline
         env:
           ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
           ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
         run: python run_pipeline.py
+
+      - name: Data drift check (neon-data-diff)
+        id: drift
+        continue-on-error: true   # report only: never blocks the upload
+        run: |
+          if [ ! -f "$RUNNER_TEMP/yesterday.duckdb" ]; then echo "skipped: no snapshot"; exit 0; fi
+          pip install "neon-data-diff[duckdb] @ git+https://github.com/evgeniimatveev/neon-data-diff@v0.2.0"
+          set +e
+          neon-data-diff             --duckdb-base "$RUNNER_TEMP/yesterday.duckdb" --duckdb-head data/job_market.duckdb             --key job_market_history=run_id,tech_stack,location --key pipeline_runs=run_id             --base-label yesterday --head-label today --title "Data drift"             --max-rewrite-pct 0 --markdown "$RUNNER_TEMP/drift.md"
+          rc=$?
+          [ -f "$RUNNER_TEMP/drift.md" ] && cat "$RUNNER_TEMP/drift.md" >> "$GITHUB_STEP_SUMMARY"
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit $rc
+
+      - name: Open an issue if history was rewritten
+        if: steps.drift.outputs.rc == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue create --title "Data drift on $(date -u +%F)" --body-file "$RUNNER_TEMP/drift.md"
 
       - name: Update README with today's market stats
         run: python scripts/update_readme.py
